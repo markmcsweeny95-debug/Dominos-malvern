@@ -3,177 +3,106 @@
 <head>
 <meta charset="UTF-8">
 <title>Dominos Malvern</title>
-
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #f4f4f4;
-}
+body { margin:0; font-family:Arial; background:#f4f4f4; }
 
-/* HEADER */
 header {
-    background: #006491;
-    color: white;
-    padding: 15px;
-    display: flex;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 10;
+    background:#006491; color:white;
+    padding:15px; display:flex; justify-content:space-between;
+    position:sticky; top:0;
 }
 
-.cart-icon {
-    cursor: pointer;
-}
-
-/* HERO */
 .hero {
-    background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
+    background:linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),
     url("https://images.unsplash.com/photo-1513104890138-7c749659a591");
-    background-size: cover;
-    height: 160px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 22px;
+    height:160px; display:flex; align-items:center; justify-content:center;
+    color:white; font-size:22px;
 }
 
-/* MENU */
-.menu {
-    padding: 15px;
-}
+.menu { padding:15px; }
 
-/* MOBILE FIRST: 1 COLUMN */
 .items {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 15px;
+    display:grid;
+    grid-template-columns:1fr;
+    gap:15px;
 }
 
-/* DESKTOP: more columns */
-@media (min-width: 700px) {
-    .items {
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    }
+@media(min-width:700px){
+    .items{grid-template-columns:repeat(auto-fill,minmax(220px,1fr));}
 }
 
-/* CARD */
 .card {
-    background: white;
-    padding: 10px;
-    border-radius: 6px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    background:white; padding:10px; border-radius:6px;
 }
 
 .card img {
-    width: 100%;
-    height: 160px;
-    object-fit: cover;
+    width:100%; height:160px; object-fit:cover;
 }
 
-.price {
-    font-weight: bold;
-    margin: 5px 0;
+.price { font-weight:bold; }
+
+button {
+    width:100%; padding:12px;
+    background:#e31837; color:white; border:none;
 }
 
-.card button {
-    width: 100%;
-    padding: 12px;
-    font-size: 16px;
-    background: #e31837;
-    color: white;
-    border: none;
-    cursor: pointer;
-}
+button.added { background:#4CAF50; }
 
-.card button.added {
-    background: #4CAF50;
-}
-
-/* TOAST */
-.toast {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: black;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 20px;
-    opacity: 0;
-    transition: 0.3s;
-}
-
-.toast.show {
-    opacity: 1;
-}
-
-/* OVERLAY */
+/* BASKET */
 .overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.5);
-    display: none;
+    position:fixed; inset:0;
+    background:rgba(0,0,0,0.5);
+    display:none;
 }
 
-.overlay.show {
-    display: block;
-}
+.overlay.show { display:block; }
 
-/* FULLSCREEN BASKET */
 .basket {
-    position: fixed;
-    bottom: -100%;
-    left: 0;
-    width: 100%;
-    height: 90%;
-    background: white;
-    border-radius: 15px 15px 0 0;
-    padding: 15px;
-    transition: 0.3s;
-    overflow-y: auto;
+    position:fixed;
+    bottom:-100%;
+    left:0;
+    width:100%;
+    height:90%;
+    background:white;
+    border-radius:15px 15px 0 0;
+    padding:15px;
+    transition:0.3s;
+    overflow-y:auto;
 }
 
-.basket.open {
-    bottom: 0;
+.basket.open { bottom:0; }
+
+.close-btn { float:right; cursor:pointer; }
+
+.toast {
+    position:fixed;
+    bottom:20px;
+    left:50%;
+    transform:translateX(-50%);
+    background:black;
+    color:white;
+    padding:10px 20px;
+    border-radius:20px;
+    opacity:0;
 }
 
-.close-btn {
-    float: right;
-    font-size: 20px;
-    cursor: pointer;
-}
-
-.basket-item {
-    padding: 8px 0;
-    border-bottom: 1px solid #eee;
-}
-
-.total {
-    font-weight: bold;
-    margin-top: 10px;
-}
+.toast.show { opacity:1; }
 
 .pay-btn {
-    width: 100%;
-    padding: 15px;
-    background: green;
-    color: white;
-    border: none;
-    margin-top: 10px;
-    font-size: 16px;
+    width:100%;
+    padding:15px;
+    background:green;
+    color:white;
+    margin-top:10px;
 }
 
-/* FOOTER */
 footer {
-    background: #006491;
-    color: white;
-    text-align: center;
-    padding: 10px;
+    background:#006491;
+    color:white;
+    text-align:center;
+    padding:10px;
 }
 </style>
 </head>
@@ -182,12 +111,10 @@ footer {
 
 <header>
     <div>Dominos Malvern</div>
-    <div class="cart-icon" onclick="openBasket()">
-        Cart (<span id="count">0</span>)
-    </div>
+    <div onclick="openBasket()">Cart (<span id="count">0</span>)</div>
 </header>
 
-<div class="hero">Order Pizza</div>
+<div class="hero">Order Food</div>
 
 <div class="menu">
     <div class="items" id="menu"></div>
@@ -206,7 +133,9 @@ footer {
     <input id="promoInput" placeholder="Promo code">
     <button onclick="applyPromo()">Apply</button>
 
-    <div class="total">
+    <div id="applied-promos" style="font-size:14px;margin-top:10px;"></div>
+
+    <div style="font-weight:bold;margin-top:10px;">
         Total: £<span id="total">0.00</span>
     </div>
 
@@ -216,104 +145,111 @@ footer {
 <footer>© 2026 Dominos Malvern</footer>
 
 <script>
-let pizzas = [
+let items = [
 ["Pepperoni",9.99,"photo-1594007654729-407eedc4be65"],
-["Veggie",8.99,"photo-1548365328-9f547fb0953d"],
 ["BBQ Chicken",10.49,"photo-1600628422019-2e6d3c7b4c1e"],
 ["Meat Feast",11.99,"photo-1601924638867-3ec2c3fda4c9"],
 ["Hawaiian",9.49,"photo-1590947132387-155cc02f3212"],
 ["Cheese Feast",7.99,"photo-1600891964599-f61ba0e24092"],
-["Spicy Beef",10.99,"photo-1542281286-9e0a16bb7366"],
-["Chicken Supreme",10.49,"photo-1555992336-03a23c7b20ee"],
-["Garlic Bread",6.99,"photo-1585238342024-78d387f4a707"],
-["Double Pepperoni",11.49,"photo-1604382354936-07c5d9983bd3"],
-["Texas BBQ",10.99,"photo-1513104890138-7c749659a591"],
-["Ultimate Cheese",8.99,"photo-1593560708920-61dd98c46a4e"],
-["Veggie Deluxe",9.49,"photo-1540189549336-e6e99c3679fe"],
-["Hot & Spicy",10.99,"photo-1604908554025-1cfcbe0e6bdb"],
-["Pigeon Special",4.99,"photo-1518791841217-8f162f1e1131"]
+["Pigeon Special",4.99,"photo-1518791841217-8f162f1e1131"],
+
+// DRINKS
+["Coca Cola",2.49,"photo-1580910051074-3eb694886505"],
+["Fanta",2.49,"photo-1585238342024-78d387f4a707"],
+["Water",1.50,"photo-1502741338009-cac2772e18bc"],
+["Sprite",2.49,"photo-1571687949920-3c8a73e1b5f2"]
 ];
 
-let total = 0, count = 0, discount = 0;
+let total = 0, count = 0;
+let percentDiscount = 0;
+let fixedDiscount = 0;
 
 const menu = document.getElementById("menu");
 
-pizzas.forEach(p => {
-    let card = document.createElement("div");
-    card.className = "card";
+items.forEach(p=>{
+    let card=document.createElement("div");
+    card.className="card";
 
-    card.innerHTML = `
-        <img src="https://images.unsplash.com/${p[2]}">
-        <h3>${p[0]}</h3>
-        <div class="price">£${p[1]}</div>
-        <button>Add</button>
-    `;
+    card.innerHTML=`
+    <img src="https://images.unsplash.com/${p[2]}">
+    <h3>${p[0]}</h3>
+    <div class="price">£${p[1]}</div>
+    <button>Add</button>`;
 
-    let btn = card.querySelector("button");
+    let btn=card.querySelector("button");
 
-    btn.onclick = () => {
-        addToBasket(p[0], p[1]);
+    btn.onclick=()=>{
+        addToBasket(p[0],p[1]);
 
-        btn.textContent = "Added ✓";
+        btn.textContent="Added ✓";
         btn.classList.add("added");
 
-        setTimeout(()=> {
-            btn.textContent = "Add";
+        setTimeout(()=>{
+            btn.textContent="Add";
             btn.classList.remove("added");
         },1000);
 
-        showToast(p[0] + " added");
+        toast(p[0]+" added");
     };
 
     menu.appendChild(card);
 });
 
-function addToBasket(name, price) {
-    let div = document.createElement("div");
-    div.className = "basket-item";
-    div.textContent = name + " - £" + price;
+function addToBasket(name,price){
+    let div=document.createElement("div");
+    div.textContent=name+" - £"+price;
 
     document.getElementById("basket-items").appendChild(div);
 
-    total += price;
+    total+=price;
     count++;
 
     updateTotal();
-    document.getElementById("count").textContent = count;
+    document.getElementById("count").textContent=count;
 }
 
-function updateTotal() {
-    let final = total * (1 - discount);
-    document.getElementById("total").textContent = final.toFixed(2);
-}
+function applyPromo(){
+    let code=document.getElementById("promoInput").value.toUpperCase();
+    let desc="";
 
-function applyPromo() {
-    let code = document.getElementById("promoInput").value.toUpperCase();
-
-    if(code === "JEAN") discount = 0.99;
-    else if(code === "MATTHEW") discount = 0.5;
+    if(code==="JEAN") {percentDiscount+=0.99; desc="99% off";}
+    else if(code==="MATTHEW") {percentDiscount+=0.5; desc="50% off";}
+    else if(code==="THOMAS") {percentDiscount+=1.01; desc="101% off";}
+    else if(code==="PIGEON") {percentDiscount+=0.01; desc="1% off";}
+    else if(code==="PETE-ALLEN") {fixedDiscount+=1; desc="£1 off";}
+    else if(code==="JEAN-ALLEN") {fixedDiscount+=100; desc="£100 off";}
     else return alert("Invalid code");
+
+    let d=document.createElement("div");
+    d.textContent=code+" → "+desc;
+    document.getElementById("applied-promos").appendChild(d);
 
     updateTotal();
 }
 
-function payNow() {
+function updateTotal(){
+    let final=total*(1-percentDiscount)-fixedDiscount;
+    let display=final<0?"-"+Math.abs(final).toFixed(2):final.toFixed(2);
+    document.getElementById("total").textContent=display;
+}
+
+function payNow(){
     alert("Payment successful (not really)");
 }
 
-function showToast(text) {
-    let t = document.getElementById("toast");
-    t.textContent = text;
-    t.classList.add("show");
-    setTimeout(()=>t.classList.remove("show"),1500);
+function toast(t){
+    let el=document.getElementById("toast");
+    el.textContent=t;
+    el.classList.add("show");
+    setTimeout(()=>el.classList.remove("show"),1500);
 }
 
-function openBasket() {
+function openBasket(){
     basket.classList.add("open");
     overlay.classList.add("show");
 }
 
-function closeBasket() {
+function closeBasket(){
     basket.classList.remove("open");
     overlay.classList.remove("show");
 }
