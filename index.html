@@ -9,16 +9,24 @@
 body { margin:0; font-family:Arial; background:#f4f4f4; }
 
 header {
-    background:#006491; color:white;
-    padding:15px; display:flex; justify-content:space-between;
-    position:sticky; top:0;
+    background:#006491;
+    color:white;
+    padding:15px;
+    display:flex;
+    justify-content:space-between;
+    position:sticky;
+    top:0;
 }
 
 .hero {
     background:linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),
     url("https://images.unsplash.com/photo-1513104890138-7c749659a591");
-    height:160px; display:flex; align-items:center; justify-content:center;
-    color:white; font-size:22px;
+    height:160px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:white;
+    font-size:22px;
 }
 
 .menu { padding:15px; }
@@ -34,25 +42,31 @@ header {
 }
 
 .card {
-    background:white; padding:10px; border-radius:6px;
+    background:white;
+    padding:10px;
+    border-radius:6px;
 }
 
 .card img {
-    width:100%; height:160px; object-fit:cover;
+    width:100%;
+    height:160px;
+    object-fit:cover;
 }
 
 .price { font-weight:bold; }
 
 button {
-    width:100%; padding:12px;
-    background:#e31837; color:white; border:none;
+    width:100%;
+    padding:12px;
+    background:#e31837;
+    color:white;
+    border:none;
 }
 
-button.added { background:#4CAF50; }
-
-/* BASKET */
+/* basket */
 .overlay {
-    position:fixed; inset:0;
+    position:fixed;
+    inset:0;
     background:rgba(0,0,0,0.5);
     display:none;
 }
@@ -76,19 +90,14 @@ button.added { background:#4CAF50; }
 
 .close-btn { float:right; cursor:pointer; }
 
-.toast {
-    position:fixed;
-    bottom:20px;
-    left:50%;
-    transform:translateX(-50%);
-    background:black;
-    color:white;
-    padding:10px 20px;
-    border-radius:20px;
-    opacity:0;
+/* checkout */
+#checkout-bar {
+    position: sticky;
+    bottom: 0;
+    background: white;
+    padding-top: 10px;
+    border-top: 1px solid #ddd;
 }
-
-.toast.show { opacity:1; }
 
 .pay-btn {
     width:100%;
@@ -98,12 +107,51 @@ button.added { background:#4CAF50; }
     margin-top:10px;
 }
 
-footer {
-    background:#006491;
+/* loading */
+#pay-overlay {
+    position:fixed;
+    inset:0;
+    background:black;
     color:white;
-    text-align:center;
-    padding:10px;
+    display:none;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    z-index:9999;
 }
+
+#bar-container {
+    width:80%;
+    height:20px;
+    background:#333;
+    border-radius:10px;
+    margin-top:20px;
+}
+
+#bar {
+    height:100%;
+    width:0%;
+    background:#4CAF50;
+}
+
+/* receipt */
+#receipt {
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.7);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:10000;
+}
+
+.receipt-card {
+    width:320px;
+    background:white;
+    padding:20px;
+    font-family:monospace;
+}
+
 </style>
 </head>
 
@@ -120,8 +168,6 @@ footer {
     <div class="items" id="menu"></div>
 </div>
 
-<div class="toast" id="toast"></div>
-
 <div class="overlay" id="overlay" onclick="closeBasket()"></div>
 
 <div class="basket" id="basket">
@@ -130,40 +176,79 @@ footer {
 
     <div id="basket-items"></div>
 
-    <input id="promoInput" placeholder="Promo code">
-    <button onclick="applyPromo()">Apply</button>
+    <div id="checkout-bar">
+        <input id="promoInput" placeholder="Promo code">
+        <button onclick="applyPromo()">Apply</button>
 
-    <div id="applied-promos" style="font-size:14px;margin-top:10px;"></div>
+        <div id="promo-list"></div>
 
-    <div style="font-weight:bold;margin-top:10px;">
-        Total: £<span id="total">0.00</span>
+        <div style="font-weight:bold;margin-top:10px;">
+            Total: £<span id="total">0.00</span>
+        </div>
+
+        <button class="pay-btn" onclick="payNow()">Pay Now</button>
     </div>
-
-    <button class="pay-btn" onclick="payNow()">Pay Now</button>
 </div>
 
-<footer>© 2026 Dominos Malvern</footer>
+<!-- LOADING -->
+<div id="pay-overlay">
+    <h2 id="pay-text">Processing payment...</h2>
+    <div id="bar-container">
+        <div id="bar"></div>
+    </div>
+</div>
+
+<!-- RECEIPT -->
+<div id="receipt">
+    <div class="receipt-card">
+        <h2>DOMINOS MALVERN</h2>
+        <p>Cashier: Jean Allen</p>
+        <p id="time"></p>
+        <hr>
+
+        <div id="receipt-items"></div>
+
+        <hr>
+        <div id="receipt-promos"></div>
+
+        <hr>
+        <p>Total: £<span id="final"></span></p>
+
+        <p style="text-align:center;">THANK YOU 🍕</p>
+    </div>
+</div>
 
 <script>
+
+/* MENU */
 let items = [
-["Pepperoni",9.99,"photo-1594007654729-407eedc4be65"],
+["Pepperoni",9.99,"photo-1601924582970-9238bcb495d8"],
+["Margherita",8.99,"photo-1548365328-8b849e6f9f3b"],
 ["BBQ Chicken",10.49,"photo-1600628422019-2e6d3c7b4c1e"],
 ["Meat Feast",11.99,"photo-1601924638867-3ec2c3fda4c9"],
-["Hawaiian",9.49,"photo-1590947132387-155cc02f3212"],
-["Cheese Feast",7.99,"photo-1600891964599-f61ba0e24092"],
-["Pigeon Special",4.99,"photo-1518791841217-8f162f1e1131"],
+["Hawaiian",9.49,"photo-1593560708920-61dd98c46a4e"],
+["Cheese Feast",7.99,"photo-1542281286-9e0a16bb7366"],
+["Veggie",9.99,"photo-1540189549336-e6e99c3679fe"],
+["Spicy Beef",10.99,"photo-1604908554025-1cfcbe0e6bdb"],
+["Chicken Supreme",10.49,"photo-1555992336-03a23c7b20ee"],
+["Garlic Pizza",6.99,"photo-1615719413546-198b25453f85"],
+["Double Pepperoni",11.49,"photo-1628840042765-356cda07504e"],
+["BBQ Deluxe",12.49,"photo-1594007654729-407eedc4be65"],
 
-// DRINKS
-["Coca Cola",2.49,"photo-1580910051074-3eb694886505"],
-["Fanta",2.49,"photo-1585238342024-78d387f4a707"],
-["Water",1.50,"photo-1502741338009-cac2772e18bc"],
-["Sprite",2.49,"photo-1571687949920-3c8a73e1b5f2"]
+["Coke",2.49,"photo-1622483767028-3f66f32aef97"],
+["Fanta",2.49,"photo-1580910051074-3eb694886505"],
+["Sprite",2.49,"photo-1625772299848-391b6a5d6c9c"],
+["Water",1.50,"photo-1559839734-2b71ea197ec2"]
 ];
 
-let total = 0, count = 0;
+let cart = {};
+let promos = [];
+
+let total = 0;
 let percentDiscount = 0;
 let fixedDiscount = 0;
 
+/* BUILD MENU */
 const menu = document.getElementById("menu");
 
 items.forEach(p=>{
@@ -176,74 +261,117 @@ items.forEach(p=>{
     <div class="price">£${p[1]}</div>
     <button>Add</button>`;
 
-    let btn=card.querySelector("button");
+    card.querySelector("button").onclick=()=>{
 
-    btn.onclick=()=>{
-        addToBasket(p[0],p[1]);
+        if(!cart[p[0]]) cart[p[0]]={price:p[1],qty:0};
 
-        btn.textContent="Added ✓";
-        btn.classList.add("added");
+        cart[p[0]].qty++;
+        total += p[1];
 
-        setTimeout(()=>{
-            btn.textContent="Add";
-            btn.classList.remove("added");
-        },1000);
+        updateBasket();
+        updateTotal();
 
-        toast(p[0]+" added");
+        document.getElementById("count").textContent =
+            Object.values(cart).reduce((a,b)=>a+b.qty,0);
     };
 
     menu.appendChild(card);
 });
 
-function addToBasket(name,price){
-    let div=document.createElement("div");
-    div.textContent=name+" - £"+price;
+/* BASKET */
+function updateBasket(){
+    let div=document.getElementById("basket-items");
+    div.innerHTML="";
 
-    document.getElementById("basket-items").appendChild(div);
+    for(let n in cart){
+        let i=cart[n];
 
-    total+=price;
-    count++;
-
-    updateTotal();
-    document.getElementById("count").textContent=count;
+        div.innerHTML += `
+        <div style="padding:6px 0;border-bottom:1px solid #eee;">
+            ${n} (${i.qty}) - £${(i.qty*i.price).toFixed(2)}
+        </div>`;
+    }
 }
 
+/* PROMOS */
 function applyPromo(){
     let code=document.getElementById("promoInput").value.toUpperCase();
     let desc="";
 
-    if(code==="JEAN") {percentDiscount+=0.99; desc="99% off";}
-    else if(code==="MATTHEW") {percentDiscount+=0.5; desc="50% off";}
-    else if(code==="THOMAS") {percentDiscount+=1.01; desc="101% off";}
-    else if(code==="PIGEON") {percentDiscount+=0.01; desc="1% off";}
-    else if(code==="PETE-ALLEN") {fixedDiscount+=1; desc="£1 off";}
-    else if(code==="JEAN-ALLEN") {fixedDiscount+=100; desc="£100 off";}
+    if(code==="JEAN"){percentDiscount+=0.99; desc="99% off";}
+    else if(code==="MATTHEW"){percentDiscount+=0.5; desc="50% off";}
+    else if(code==="THOMAS"){percentDiscount+=1.01; desc="101% off";}
+    else if(code==="PIGEON"){percentDiscount+=0.01; desc="1% off";}
+    else if(code==="PETE-ALLEN"){fixedDiscount+=1; desc="£1 off";}
+    else if(code==="JEAN-ALLEN"){fixedDiscount+=100; desc="£100 off";}
+
+/* 🔥 NEW CODE */
+    else if(code==="MARK"){percentDiscount -= 0.5; desc="-50% off (PRICE INCREASE)";}
+
     else return alert("Invalid code");
 
-    let d=document.createElement("div");
-    d.textContent=code+" → "+desc;
-    document.getElementById("applied-promos").appendChild(d);
+    promos.push(code+" → "+desc);
+
+    document.getElementById("promo-list").innerHTML =
+        promos.map(p=>`<div>${p}</div>`).join("");
 
     updateTotal();
 }
 
+/* TOTAL */
 function updateTotal(){
-    let final=total*(1-percentDiscount)-fixedDiscount;
-    let display=final<0?"-"+Math.abs(final).toFixed(2):final.toFixed(2);
-    document.getElementById("total").textContent=display;
+    let final = total*(1-percentDiscount)-fixedDiscount;
+    if(!isFinite(final)) final=0;
+
+    document.getElementById("total").textContent =
+        final < 0 ? "-" + Math.abs(final).toFixed(2) : final.toFixed(2);
 }
 
+/* PAY (10s) */
 function payNow(){
-    alert("Payment successful (not really)");
+    let overlay=document.getElementById("pay-overlay");
+    let bar=document.getElementById("bar");
+
+    overlay.style.display="flex";
+
+    let p=0;
+
+    let i=setInterval(()=>{
+        p+=1;
+        bar.style.width=p+"%";
+
+        if(p>=100){
+            clearInterval(i);
+            overlay.style.display="none";
+            showReceipt();
+        }
+    },100);
 }
 
-function toast(t){
-    let el=document.getElementById("toast");
-    el.textContent=t;
-    el.classList.add("show");
-    setTimeout(()=>el.classList.remove("show"),1500);
+/* RECEIPT */
+function showReceipt(){
+
+    document.getElementById("receipt").style.display="flex";
+
+    let now=new Date();
+    document.getElementById("time").textContent=now.toLocaleString();
+
+    let html="";
+    for(let n in cart){
+        let i=cart[n];
+        html+=`${n} (${i.qty}) - £${(i.qty*i.price).toFixed(2)}<br>`;
+    }
+
+    document.getElementById("receipt-items").innerHTML=html;
+    document.getElementById("receipt-promos").innerHTML=promos.join("<br>");
+
+    let final = total*(1-percentDiscount)-fixedDiscount;
+
+    document.getElementById("final").textContent =
+        final < 0 ? "-" + Math.abs(final).toFixed(2) : final.toFixed(2);
 }
 
+/* UI */
 function openBasket(){
     basket.classList.add("open");
     overlay.classList.add("show");
@@ -253,6 +381,7 @@ function closeBasket(){
     basket.classList.remove("open");
     overlay.classList.remove("show");
 }
+
 </script>
 
 </body>
