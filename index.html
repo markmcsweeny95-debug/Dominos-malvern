@@ -2,52 +2,38 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Domino's Malvern (Mock)</title>
+<title>Dominos Malvern</title>
 
 <style>
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background-color: #f5f5f5;
+    background: #f4f4f4;
 }
 
-/* HEADER */
 header {
-    background-color: #006491;
+    background: #006491;
     color: white;
     padding: 12px 20px;
     display: flex;
     justify-content: space-between;
-    align-items: center;
 }
 
-header h1 {
-    margin: 0;
-    font-size: 20px;
-}
-
-.nav-buttons button {
-    background: white;
-    color: #006491;
-    border: none;
-    padding: 8px 12px;
-    margin-left: 8px;
-    border-radius: 4px;
+.cart-icon {
     cursor: pointer;
-    font-weight: bold;
 }
 
 /* HERO */
 .hero {
-    background: url("https://images.unsplash.com/photo-1601924638867-3ec2c3fda4c9") center/cover;
-    height: 180px;
+    background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
+    url("https://images.unsplash.com/photo-1513104890138-7c749659a591");
+    background-size: cover;
+    height: 200px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    font-size: 24px;
-    font-weight: bold;
-    text-shadow: 2px 2px 5px black;
+    font-size: 26px;
 }
 
 /* MENU */
@@ -57,78 +43,130 @@ header h1 {
     padding: 20px;
 }
 
-.menu h2 {
-    margin-bottom: 15px;
-}
-
-/* GRID */
 .items {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 15px;
 }
 
-/* CARD */
 .card {
     background: white;
-    border-radius: 8px;
     padding: 10px;
-    text-align: left;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border-radius: 6px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    transition: 0.2s;
+}
+
+.card.added {
+    border: 2px solid #4CAF50;
+    transform: scale(1.02);
 }
 
 .card img {
     width: 100%;
     height: 140px;
     object-fit: cover;
-    border-radius: 6px;
 }
 
-.card h3 {
-    margin: 8px 0 5px;
-    font-size: 16px;
-}
-
-.card p {
-    font-size: 13px;
-    color: #555;
-    margin: 0 0 8px;
+.price {
+    font-weight: bold;
 }
 
 .card button {
     width: 100%;
     padding: 8px;
-    background-color: #e31837;
+    background: #e31837;
     color: white;
     border: none;
-    border-radius: 4px;
     cursor: pointer;
 }
 
-/* SCROLL OFFERS */
-.offers {
-    background: white;
-    max-width: 1100px;
-    margin: 20px auto;
-    padding: 15px;
-    border-radius: 8px;
-    max-height: 120px;
-    overflow-y: auto;
+.card button.added {
+    background: #4CAF50;
 }
 
-.offer {
-    padding: 8px;
-    border-bottom: 1px solid #ddd;
+/* TOAST */
+.toast {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    background: black;
+    color: white;
+    padding: 10px;
+    opacity: 0;
+    transition: 0.3s;
+}
+
+.toast.show {
+    opacity: 1;
+}
+
+/* BASKET */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.4);
+    display: none;
+}
+
+.overlay.show {
+    display: block;
+}
+
+.basket {
+    position: fixed;
+    right: -320px;
+    top: 0;
+    width: 300px;
+    height: 100%;
+    background: white;
+    padding: 15px;
+    transition: 0.3s;
+}
+
+.basket.open {
+    right: 0;
+}
+
+.close-btn {
+    float: right;
+    cursor: pointer;
+}
+
+.basket-item {
     font-size: 14px;
+    border-bottom: 1px solid #eee;
+    padding: 5px 0;
+}
+
+.total {
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.promo {
+    margin-top: 10px;
+}
+
+.pay-btn {
+    width: 100%;
+    padding: 10px;
+    background: green;
+    color: white;
+    border: none;
+    margin-top: 10px;
+    cursor: pointer;
 }
 
 /* FOOTER */
 footer {
-    background-color: #006491;
+    background: #006491;
     color: white;
     text-align: center;
     padding: 10px;
-    margin-top: 20px;
 }
 </style>
 </head>
@@ -136,80 +174,159 @@ footer {
 <body>
 
 <header>
-    <h1>🍕 Domino's Malvern</h1>
-    <div class="nav-buttons">
-        <button>Menu</button>
-        <button>Deals</button>
-        <button>Login</button>
+    <h1>Dominos Malvern</h1>
+    <div class="cart-icon" onclick="openBasket()">
+        Cart (<span id="count">0</span>)
     </div>
 </header>
 
-<div class="hero">
-    Fresh Pizza Delivered Fast 🍕
-</div>
+<div class="hero">Order Pizza Online</div>
 
 <div class="menu">
-    <h2>All Pizzas</h2>
+    <div class="items" id="menu"></div>
+</div>
 
-    <div class="items">
+<div class="toast" id="toast"></div>
 
-        <div class="card">
-            <img src="https://images.unsplash.com/photo-1594007654729-407eedc4be65">
-            <h3>Pepperoni Passion</h3>
-            <p>Classic pepperoni with mozzarella</p>
-            <button>Add to Basket</button>
-        </div>
+<div class="overlay" id="overlay" onclick="closeBasket()"></div>
 
-        <div class="card">
-            <img src="https://images.unsplash.com/photo-1548365328-9f547fb0953d">
-            <h3>Veggie Supreme</h3>
-            <p>Loaded with fresh vegetables</p>
-            <button>Add to Basket</button>
-        </div>
+<div class="basket" id="basket">
+    <span class="close-btn" onclick="closeBasket()">✖</span>
+    <h2>Your Basket</h2>
 
-        <div class="card">
-            <img src="https://images.unsplash.com/photo-1600628422019-2e6d3c7b4c1e">
-            <h3>BBQ Chicken</h3>
-            <p>BBQ sauce, chicken & onions</p>
-            <button>Add to Basket</button>
-        </div>
+    <div id="basket-items"></div>
 
-        <div class="card">
-            <img src="https://images.unsplash.com/photo-1601924638867-3ec2c3fda4c9">
-            <h3>Meat Feast</h3>
-            <p>Pepperoni, ham, sausage & beef</p>
-            <button>Add to Basket</button>
-        </div>
-
-        <div class="card">
-            <img src="https://images.unsplash.com/photo-1590947132387-155cc02f3212">
-            <h3>Hawaiian</h3>
-            <p>Ham & pineapple (controversial 👀)</p>
-            <button>Add to Basket</button>
-        </div>
-
-        <!-- PIGEON PIZZA -->
-        <div class="card">
-            <img src="https://images.unsplash.com/photo-1552728089-57bdde30beb3">
-            <h3>Pigeon Special</h3>
-            <p>Locally sourced street bird with herbs 🐦</p>
-            <button>Add to Basket</button>
-        </div>
-
+    <div class="promo">
+        <input id="promoInput" placeholder="Promo code">
+        <button onclick="applyPromo()">Apply</button>
     </div>
+
+    <div class="total">
+        Total: £<span id="total">0.00</span>
+    </div>
+
+    <button class="pay-btn" onclick="payNow()">Pay Now</button>
 </div>
 
-<div class="offers">
-    <div class="offer">🔥 Any 2 Medium Pizzas for £19.99</div>
-    <div class="offer">🍗 Free Garlic Bread over £25</div>
-    <div class="offer">🍕 Student Discount 20% Off</div>
-    <div class="offer">🚴 Free Delivery Weekends</div>
-    <div class="offer">🥤 Free Drink with Large Pizza</div>
-</div>
+<footer>© 2026 Dominos Malvern</footer>
 
-<footer>
-    © 2026 Domino's Malvern (Mock Site)
-</footer>
+<script>
+let pizzas = [
+["Pepperoni",9.99,"photo-1594007654729-407eedc4be65"],
+["Veggie",8.99,"photo-1548365328-9f547fb0953d"],
+["BBQ Chicken",10.49,"photo-1600628422019-2e6d3c7b4c1e"],
+["Meat Feast",11.99,"photo-1601924638867-3ec2c3fda4c9"],
+["Hawaiian",9.49,"photo-1590947132387-155cc02f3212"],
+["Cheese Feast",7.99,"photo-1600891964599-f61ba0e24092"],
+["Spicy Beef",10.99,"photo-1542281286-9e0a16bb7366"],
+["Chicken Supreme",10.49,"photo-1555992336-03a23c7b20ee"],
+["Garlic Bread",6.99,"photo-1585238342024-78d387f4a707"],
+["Double Pepperoni",11.49,"photo-1604382354936-07c5d9983bd3"],
+["Texas BBQ",10.99,"photo-1513104890138-7c749659a591"],
+["Ultimate Cheese",8.99,"photo-1593560708920-61dd98c46a4e"],
+["Veggie Deluxe",9.49,"photo-1540189549336-e6e99c3679fe"],
+["Hot & Spicy",10.99,"photo-1604908554025-1cfcbe0e6bdb"],
+["Pigeon Special",4.99,"photo-1518791841217-8f162f1e1131"]
+];
+
+let total = 0;
+let count = 0;
+let discount = 0;
+
+/* LOAD MENU */
+const menu = document.getElementById("menu");
+
+pizzas.forEach(p => {
+    let card = document.createElement("div");
+    card.className = "card";
+
+    let img = `https://images.unsplash.com/${p[2]}`;
+
+    card.innerHTML = `
+        <img src="${img}">
+        <h3>${p[0]}</h3>
+        <div class="price">£${p[1]}</div>
+        <button>Add</button>
+    `;
+
+    let btn = card.querySelector("button");
+
+    btn.onclick = () => {
+        addToBasket(p[0], p[1]);
+
+        btn.textContent = "Added ✓";
+        btn.classList.add("added");
+        card.classList.add("added");
+
+        setTimeout(() => {
+            btn.textContent = "Add";
+            btn.classList.remove("added");
+            card.classList.remove("added");
+        }, 1000);
+
+        showToast(p[0] + " added");
+    };
+
+    menu.appendChild(card);
+});
+
+/* CART */
+function addToBasket(name, price) {
+    const basket = document.getElementById("basket-items");
+
+    const item = document.createElement("div");
+    item.className = "basket-item";
+    item.textContent = name + " - £" + price;
+
+    basket.appendChild(item);
+
+    total += price;
+    count++;
+
+    updateTotal();
+    document.getElementById("count").textContent = count;
+}
+
+function updateTotal() {
+    let final = total * (1 - discount);
+    document.getElementById("total").textContent = final.toFixed(2);
+}
+
+/* PROMO */
+function applyPromo() {
+    let code = document.getElementById("promoInput").value.toUpperCase();
+
+    if (code === "JEAN") discount = 0.99;
+    else if (code === "MATTHEW") discount = 0.5;
+    else return alert("Invalid code");
+
+    updateTotal();
+}
+
+/* PAY */
+function payNow() {
+    alert("Payment successful (not really)");
+}
+
+/* TOAST */
+function showToast(text) {
+    let t = document.getElementById("toast");
+    t.textContent = text;
+    t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), 1500);
+}
+
+/* BASKET */
+function openBasket() {
+    basket.classList.add("open");
+    overlay.classList.add("show");
+}
+
+function closeBasket() {
+    basket.classList.remove("open");
+    overlay.classList.remove("show");
+}
+</script>
 
 </body>
 </html>
