@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <title>Dominos Malvern</title>
 
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
 <style>
 body {
     margin: 0;
@@ -11,12 +13,16 @@ body {
     background: #f4f4f4;
 }
 
+/* HEADER */
 header {
     background: #006491;
     color: white;
-    padding: 12px 20px;
+    padding: 15px;
     display: flex;
     justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
 
 .cart-icon {
@@ -28,53 +34,56 @@ header {
     background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
     url("https://images.unsplash.com/photo-1513104890138-7c749659a591");
     background-size: cover;
-    height: 200px;
+    height: 160px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    font-size: 26px;
+    font-size: 22px;
 }
 
 /* MENU */
 .menu {
-    max-width: 1100px;
-    margin: auto;
-    padding: 20px;
+    padding: 15px;
 }
 
+/* MOBILE FIRST: 1 COLUMN */
 .items {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    grid-template-columns: 1fr;
     gap: 15px;
 }
 
+/* DESKTOP: more columns */
+@media (min-width: 700px) {
+    .items {
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    }
+}
+
+/* CARD */
 .card {
     background: white;
     padding: 10px;
     border-radius: 6px;
     box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-    transition: 0.2s;
-}
-
-.card.added {
-    border: 2px solid #4CAF50;
-    transform: scale(1.02);
 }
 
 .card img {
     width: 100%;
-    height: 140px;
+    height: 160px;
     object-fit: cover;
 }
 
 .price {
     font-weight: bold;
+    margin: 5px 0;
 }
 
 .card button {
     width: 100%;
-    padding: 8px;
+    padding: 12px;
+    font-size: 16px;
     background: #e31837;
     color: white;
     border: none;
@@ -89,10 +98,12 @@ header {
 .toast {
     position: fixed;
     bottom: 20px;
-    left: 20px;
+    left: 50%;
+    transform: translateX(-50%);
     background: black;
     color: white;
-    padding: 10px;
+    padding: 10px 20px;
+    border-radius: 20px;
     opacity: 0;
     transition: 0.3s;
 }
@@ -101,14 +112,11 @@ header {
     opacity: 1;
 }
 
-/* BASKET */
+/* OVERLAY */
 .overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0,0,0,0.4);
+    inset: 0;
+    background: rgba(0,0,0,0.5);
     display: none;
 }
 
@@ -116,30 +124,33 @@ header {
     display: block;
 }
 
+/* FULLSCREEN BASKET */
 .basket {
     position: fixed;
-    right: -320px;
-    top: 0;
-    width: 300px;
-    height: 100%;
+    bottom: -100%;
+    left: 0;
+    width: 100%;
+    height: 90%;
     background: white;
+    border-radius: 15px 15px 0 0;
     padding: 15px;
     transition: 0.3s;
+    overflow-y: auto;
 }
 
 .basket.open {
-    right: 0;
+    bottom: 0;
 }
 
 .close-btn {
     float: right;
+    font-size: 20px;
     cursor: pointer;
 }
 
 .basket-item {
-    font-size: 14px;
+    padding: 8px 0;
     border-bottom: 1px solid #eee;
-    padding: 5px 0;
 }
 
 .total {
@@ -147,18 +158,14 @@ header {
     margin-top: 10px;
 }
 
-.promo {
-    margin-top: 10px;
-}
-
 .pay-btn {
     width: 100%;
-    padding: 10px;
+    padding: 15px;
     background: green;
     color: white;
     border: none;
     margin-top: 10px;
-    cursor: pointer;
+    font-size: 16px;
 }
 
 /* FOOTER */
@@ -174,13 +181,13 @@ footer {
 <body>
 
 <header>
-    <h1>Dominos Malvern</h1>
+    <div>Dominos Malvern</div>
     <div class="cart-icon" onclick="openBasket()">
         Cart (<span id="count">0</span>)
     </div>
 </header>
 
-<div class="hero">Order Pizza Online</div>
+<div class="hero">Order Pizza</div>
 
 <div class="menu">
     <div class="items" id="menu"></div>
@@ -196,10 +203,8 @@ footer {
 
     <div id="basket-items"></div>
 
-    <div class="promo">
-        <input id="promoInput" placeholder="Promo code">
-        <button onclick="applyPromo()">Apply</button>
-    </div>
+    <input id="promoInput" placeholder="Promo code">
+    <button onclick="applyPromo()">Apply</button>
 
     <div class="total">
         Total: £<span id="total">0.00</span>
@@ -229,21 +234,16 @@ let pizzas = [
 ["Pigeon Special",4.99,"photo-1518791841217-8f162f1e1131"]
 ];
 
-let total = 0;
-let count = 0;
-let discount = 0;
+let total = 0, count = 0, discount = 0;
 
-/* LOAD MENU */
 const menu = document.getElementById("menu");
 
 pizzas.forEach(p => {
     let card = document.createElement("div");
     card.className = "card";
 
-    let img = `https://images.unsplash.com/${p[2]}`;
-
     card.innerHTML = `
-        <img src="${img}">
+        <img src="https://images.unsplash.com/${p[2]}">
         <h3>${p[0]}</h3>
         <div class="price">£${p[1]}</div>
         <button>Add</button>
@@ -256,13 +256,11 @@ pizzas.forEach(p => {
 
         btn.textContent = "Added ✓";
         btn.classList.add("added");
-        card.classList.add("added");
 
-        setTimeout(() => {
+        setTimeout(()=> {
             btn.textContent = "Add";
             btn.classList.remove("added");
-            card.classList.remove("added");
-        }, 1000);
+        },1000);
 
         showToast(p[0] + " added");
     };
@@ -270,15 +268,12 @@ pizzas.forEach(p => {
     menu.appendChild(card);
 });
 
-/* CART */
 function addToBasket(name, price) {
-    const basket = document.getElementById("basket-items");
+    let div = document.createElement("div");
+    div.className = "basket-item";
+    div.textContent = name + " - £" + price;
 
-    const item = document.createElement("div");
-    item.className = "basket-item";
-    item.textContent = name + " - £" + price;
-
-    basket.appendChild(item);
+    document.getElementById("basket-items").appendChild(div);
 
     total += price;
     count++;
@@ -292,31 +287,27 @@ function updateTotal() {
     document.getElementById("total").textContent = final.toFixed(2);
 }
 
-/* PROMO */
 function applyPromo() {
     let code = document.getElementById("promoInput").value.toUpperCase();
 
-    if (code === "JEAN") discount = 0.99;
-    else if (code === "MATTHEW") discount = 0.5;
+    if(code === "JEAN") discount = 0.99;
+    else if(code === "MATTHEW") discount = 0.5;
     else return alert("Invalid code");
 
     updateTotal();
 }
 
-/* PAY */
 function payNow() {
     alert("Payment successful (not really)");
 }
 
-/* TOAST */
 function showToast(text) {
     let t = document.getElementById("toast");
     t.textContent = text;
     t.classList.add("show");
-    setTimeout(() => t.classList.remove("show"), 1500);
+    setTimeout(()=>t.classList.remove("show"),1500);
 }
 
-/* BASKET */
 function openBasket() {
     basket.classList.add("open");
     overlay.classList.add("show");
